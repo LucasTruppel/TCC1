@@ -10,7 +10,7 @@
 #include <sys/time.h>
 
 const bool DEBUG = false;
-const bool TIMER = false;
+const bool TIMER = true;
 const bool PRINT_CFF = false;
 const bool VERIFY_CFF = false;
 
@@ -232,47 +232,27 @@ bool is_cff(ulong q, ulong k, ulong d, bool* cff) {
 }
 
 int main() {
-    const ulong p = 3;
-    const ulong n = 4;
-    const ulong initial_k = 3;
-    const ulong last_k = 3;
-    const ulong repeticoes = 5;
+    const ulong p = 2;
+    const slong n = 3;
+    const slong k = 4;
+
     ulong q = n_pow(p, n);
 
-    struct timeval start_time, end_time;
-    for (ulong k = initial_k; k <= last_k; k++) {
-        double total_time = 0.0;
-        for (int i = 0; i < repeticoes; i++) {
-            gettimeofday(&start_time, NULL);
-            bool* cff = get_cff(p, n, k);
-            gettimeofday(&end_time, NULL);
-            double elapsed_time = get_elapsed_ms(start_time, end_time);
-            total_time += elapsed_time;
-            if (i == 0 ) {
-                printf("Iteration %d\n", i);
-                printf("Elapsed time of iteration %d: %f ms\n", i, elapsed_time);
-            }   
-            free(cff);
+    bool* cff = get_cff(p, n, k);
+    printf("CFF generated\n");
+
+    if (PRINT_CFF) print_cff(cff, q, k);
+
+    if (VERIFY_CFF) {
+        const ulong d = 1;
+        if (is_cff(q, k, d, cff)) {
+            flint_printf("It is a %u-CFF\n", d);
+        } else {
+            flint_printf("It is not a %u-CFF\n", d);
         }
-        printf("q: %lu k: %lu\n", q, k);
-        printf("Average elapsed time: %f ms\n\n", total_time / repeticoes);
     }
 
-    // bool* cff = get_cff(p, n, k);
-    // printf("CFF generated\n");
-
-    // if (PRINT_CFF) print_cff(cff, q, k);
-
-    // if (VERIFY_CFF) {
-    //     const ulong d = 1;
-    //     if (is_cff(q, k, d, cff)) {
-    //         flint_printf("It is a %u-CFF\n", d);
-    //     } else {
-    //         flint_printf("It is not a %u-CFF\n", d);
-    //     }
-    // }
-
-    // free(cff);
+    free(cff);
 
     return 0;
 }
